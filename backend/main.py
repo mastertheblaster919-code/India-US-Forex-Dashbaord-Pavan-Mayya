@@ -74,6 +74,15 @@ def sanitize(obj):
 
 app = FastAPI(title="Pavan Mayya VCP API")
 
+@app.get("/")
+def read_root():
+    """Root endpoint - redirects to health check info."""
+    return {
+        "message": "VCP Dashboard API",
+        "docs": "/docs",
+        "health": "/api/health"
+    }
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

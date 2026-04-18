@@ -1,0 +1,17 @@
+fastapi
+uvicorn[standard]
+pandas
+scipy
+streamlit
+plotly
+xgboost
+scikit-learn
+shap
+numpy
+python-dotenv
+requests
+pyarrow
+apscheduler
+pytz
+httpx
+psycopg2-binary
