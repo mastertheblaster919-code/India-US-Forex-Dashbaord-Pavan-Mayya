@@ -38,7 +38,7 @@ A full-stack VCP (Volatility Contraction Pattern) scanner and ML-powered stock a
 - **ML Intelligence** — XGBoost models to predict VCP breakout winners
 - **Top 10 ML Picks** — AI-ranked stocks with highest win probability
 - **Copy the Winner** — Select a stock and find similar VCP setups using ML (KNN)
-- **Broker Integration** — Fyers API for live quotes and OHLCV data
+- **Broker Integration** - Support for broker APIs for live quotes and OHLCV data
 - **Alerts** — Telegram alert integration for intraday signals
 
 ## Tech Stack
@@ -48,14 +48,14 @@ A full-stack VCP (Volatility Contraction Pattern) scanner and ML-powered stock a
 | Backend  | Python, FastAPI, Uvicorn                      |
 | Frontend | React 19, Vite, TypeScript, TailwindCSS       |
 | ML       | XGBoost, scikit-learn, SHAP                   |
-| Data     | Fyers API v3, Parquet (local OHLCV store)     |
+| Data     | Broker API, Parquet (local OHLCV store)       |
 | Charts   | Lightweight Charts (TradingView)              |
 
 ## Prerequisites
 
 - **Python 3.11+**
 - **Node.js 18+** and npm
-- **Fyers API** credentials (App ID + access token)
+- **Broker API** credentials (optional, for live data)
 
 ## Setup
 
@@ -66,16 +66,19 @@ cd backend
 pip install -r requirements.txt
 ```
 
-### 2. Configure Fyers API
+### 2. Configure API (Optional)
 
-Create a `.env` file in the `backend/` folder:
+Create a `.env` file in the `backend/` folder for broker/telegram integration:
 
 ```env
-FYERS_APP_ID=your_fyers_app_id
-FYERS_TOKEN_FILE=fyers_token.txt
-```
+# Broker API (optional)
+# BROKER_APP_ID=your_app_id
+# BROKER_SECRET_KEY=your_secret_key
 
-Place your Fyers access token in `backend/fyers_token.txt`.
+# Telegram (optional)
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_CHAT_ID=your_chat_id
+```
 
 ### 3. Install frontend dependencies
 
@@ -127,7 +130,7 @@ Then open **http://localhost:3000** in your browser.
 
 1. **Launch Dashboard** - Run `run.bat` or start backend/frontend manually
 2. **Refresh Data** - Click **"Refresh Data (Last 5 Days)"** in the sidebar
-   - Downloads latest OHLCV from Fyers for all tickers
+   - Downloads latest OHLCV for all tickers
    - Merges with existing local data (no duplication)
    - Re-runs VCP scan on all tickers
 3. **Review Results** - Check Scanner tab for VCP opportunities
@@ -178,7 +181,7 @@ Click the **Gear icon** in the Intraday tab to configure:
 
 #### API Budget
 
-The dashboard tracks Fyers API usage (100,000 calls/day limit). Each intraday scan uses ~2 API calls per stock.
+The dashboard tracks broker API usage. Each intraday scan uses ~2 API calls per stock.
 
 ### AI Analysis
 
@@ -213,7 +216,7 @@ vcp_dashboard_india/
 │   ├── ml_api.py             # ML Intelligence API (XGBoost, KNN)
 │   ├── generate_cache.py     # Scan cache generator
 │   ├── ohlcv_store.py        # Local parquet OHLCV store
-│   ├── fyers_live.py         # Fyers API integration
+│   ├── broker_api.py         # Broker API integration
 │   ├── data_manager.py       # Scan cache I/O
 │   ├── ticker_metadata.py    # Ticker name/sector/cap metadata
 │   ├── config_loader.py      # Config file loader
@@ -255,11 +258,9 @@ Edit `config.json` to change ports or feature flags:
 Create a `.env` file in the `backend/` directory:
 
 ```env
-# Fyers API (required for live data)
-FYERS_APP_ID=your_fyers_app_id
-FYERS_SECRET_KEY=your_fyers_secret_key
-FYERS_TOKEN_FILE=fyers_token.txt
-FYERS_REDIRECT_URL=https://www.google.com
+# Broker API (optional, for live data)
+# BROKER_APP_ID=your_app_id
+# BROKER_SECRET_KEY=your_secret_key
 
 # Optional: Telegram alerts
 TELEGRAM_BOT_TOKEN=your_bot_token
@@ -274,7 +275,7 @@ MINIMAX_API_KEY=your_minimax_api_key
 ### Core Endpoints
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/health` | Health check with Fyers status |
+| GET | `/api/health` | Health check |
 | GET | `/api/status` | Data freshness status per market |
 | GET | `/api/dates` | List available scan dates |
 | GET | `/api/tickers` | List all available tickers |
@@ -285,9 +286,9 @@ MINIMAX_API_KEY=your_minimax_api_key
 ### Broker Integration
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/broker/status` | Check Fyers connection status |
-| GET | `/api/broker/fyers/auth_url` | Get Fyers OAuth URL |
-| POST | `/api/broker/fyers/login` | Complete OAuth login |
+| GET | `/api/broker/status` | Check broker connection status |
+| GET | `/api/broker/auth_url` | Get OAuth URL |
+| POST | `/api/broker/login` | Complete OAuth login |
 
 ### Portfolio & Positions
 | Method | Endpoint | Description |
@@ -350,15 +351,15 @@ backend/outputs/
 |-------|-----|
 | Backend won't start | Check Python version (`python --version` >= 3.11). Run `pip install -r backend/requirements.txt`. |
 | Frontend won't start | Run `npm install` in the `frontend/` folder. |
-| No scan data | Click **"Refresh Data"** in the sidebar. Ensure Fyers token is valid. |
-| OHLCV download fails | Check `backend/.env` has correct `FYERS_APP_ID`. Check `backend/fyers_token.txt` exists and is not expired. |
+| No scan data | Click **"Refresh Data"** in the sidebar. Ensure broker API is configured if using live data. |
+| OHLCV download fails | Check `backend/.env` has correct broker credentials. |
 | ML models not working | Go to ML Intelligence tab -> click "Rebuild Dataset" -> then "Train Models". |
 | Port conflict | Edit `config.json` and `frontend/vite.config.ts` to change ports. |
-| Fyers token expired | Re-authenticate via the Broker tab or manually update `fyers_token.txt` |
+| Broker token expired | Re-authenticate via the Broker tab |
 | Import errors | Ensure all dependencies installed: `pip install -r backend/requirements.txt` |
 | Telegram alerts not working | Verify bot token in Bot Config panel. Test with "Test Telegram" button. |
 | Intraday scan returns no results | Ensure daily scan has been run first. Watchlist is built from daily VCP scan results. |
-| API rate limit reached | Wait for next day (Fyers limit: 100,000 calls/day) or reduce scan frequency. |
+| API rate limit reached | Wait for next day or reduce scan frequency. |
 
 ## Contributing
 
@@ -371,7 +372,7 @@ Contributions are welcome! Please ensure:
 
 ### Prerequisites
 - [Railway](https://railway.app) account
-- Fyers API credentials (for production data)
+- Broker API credentials (optional, for live data)
 - Telegram Bot Token (optional, for alerts)
 
 ### Quick Deploy
@@ -381,10 +382,8 @@ Contributions are welcome! Please ensure:
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https://github.com/your-repo/vcp_dashboard_india)
 
 2. Configure environment variables in Railway dashboard:
-   - `FYERS_APP_ID` - Your Fyers App ID
-   - `FYERS_SECRET_KEY` - Your Fyers Secret Key
-   - `FYERS_TOKEN_FILE` - Set to empty, you'll authenticate via web
-   - `FYERS_REDIRECT_URL` - Set to your Railway app URL
+   - `BROKER_APP_ID` - Your Broker App ID (optional)
+   - `BROKER_SECRET_KEY` - Your Broker Secret Key (optional)
    - `TELEGRAM_BOT_TOKEN` - Optional, for alerts
    - `TELEGRAM_CHAT_ID` - Optional
 

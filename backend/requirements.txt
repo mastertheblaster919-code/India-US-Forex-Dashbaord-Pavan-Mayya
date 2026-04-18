@@ -8,7 +8,6 @@ xgboost
 scikit-learn
 shap
 numpy
-fyers-apiv3
 python-dotenv
 requests
 pyarrow
