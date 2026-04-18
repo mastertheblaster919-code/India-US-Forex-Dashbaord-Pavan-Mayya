@@ -11,9 +11,11 @@ RUN pip install --no-cache-dir yfinance
 
 COPY backend/ .
 
-# Build frontend
-COPY frontend/package.json frontend/package-lock.json* frontend/vite.config.ts ./
+# Build frontend - copy entire frontend directory and build
+COPY frontend/ ./frontend/
+WORKDIR /app/frontend
 RUN npm install && npm run build
+WORKDIR /app
 
 COPY frontend/dist/ ./static/
 
