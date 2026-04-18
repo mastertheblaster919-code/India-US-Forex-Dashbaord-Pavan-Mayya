@@ -17,7 +17,7 @@ WORKDIR /app/frontend
 RUN npm install && npm run build
 WORKDIR /app
 
-COPY frontend/dist/ ./static/
+COPY frontend/dist/ /app/static/
 
 RUN mkdir -p outputs/scan_cache outputs/ohlcv outputs/models outputs/data
 
