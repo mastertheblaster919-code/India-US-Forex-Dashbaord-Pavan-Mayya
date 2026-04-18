@@ -5,6 +5,7 @@ backend/venv
 .pytest_cache
 __pycache__
 *.pyc
-outputs
 *.log
 .env
+backend/data
+backend/outputs
