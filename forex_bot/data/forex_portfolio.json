@@ -1,0 +1,146 @@
+{
+    "balance": 100000,
+    "initial_balance": 100000,
+    "positions": [
+        {
+            "symbol": "USDJPY=X",
+            "name": "USD/JPY",
+            "dir": "LONG",
+            "entry_price": 158.6020050048828,
+            "sl": 157.66428920200892,
+            "tp": 160.00857870919364,
+            "score": 55.0,
+            "entry_time": "2026-04-18T18:50:42.719288",
+            "size": 1.0
+        },
+        {
+            "symbol": "AUDUSD=X",
+            "name": "AUD/USD",
+            "dir": "LONG",
+            "entry_price": 0.7168253064155579,
+            "sl": 0.7128029125077384,
+            "tp": 0.722858897277287,
+            "score": 55.0,
+            "entry_time": "2026-04-18T18:50:42.720944",
+            "size": 1.0
+        },
+        {
+            "symbol": "ZS=F",
+            "name": "SOYBEAN",
+            "dir": "LONG",
+            "entry_price": 1183.0,
+            "sl": 1171.4642857142858,
+            "tp": 1200.3035714285713,
+            "score": 57.9,
+            "entry_time": "2026-04-18T20:20:35.031590",
+            "size": 1.0
+        },
+        {
+            "symbol": "^DJI",
+            "name": "DOW JONES",
+            "dir": "LONG",
+            "entry_price": 49442.55859375,
+            "sl": 48952.80915178572,
+            "tp": 50177.18275669643,
+            "score": 55.8,
+            "entry_time": "2026-04-18T20:20:35.032475",
+            "size": 1.0
+        },
+        {
+            "symbol": "^FTSE",
+            "name": "FTSE 100",
+            "dir": "LONG",
+            "entry_price": 10661.080078125,
+            "sl": 10585.2216796875,
+            "tp": 10774.86767578125,
+            "score": 59.0,
+            "entry_time": "2026-04-18T20:20:35.033546",
+            "size": 1.0
+        },
+        {
+            "symbol": "^GDAXI",
+            "name": "DAX",
+            "dir": "LONG",
+            "entry_price": 24698.76953125,
+            "sl": 24441.26395089286,
+            "tp": 25085.027901785714,
+            "score": 63.0,
+            "entry_time": "2026-04-18T20:20:35.033546",
+            "size": 1.0
+        },
+        {
+            "symbol": "^FCHI",
+            "name": "CAC 40",
+            "dir": "LONG",
+            "entry_price": 8424.759765625,
+            "sl": 8353.84388950893,
+            "tp": 8531.133579799107,
+            "score": 62.2,
+            "entry_time": "2026-04-18T20:20:35.035071",
+            "size": 1.0
+        },
+        {
+            "symbol": "^N225",
+            "name": "NIKKEI 225",
+            "dir": "LONG",
+            "entry_price": 58798.0390625,
+            "sl": 58045.38169642857,
+            "tp": 59927.025111607145,
+            "score": 57.9,
+            "entry_time": "2026-04-18T20:20:35.078167",
+            "size": 1.0
+        },
+        {
+            "symbol": "^HSI",
+            "name": "HANG SENG",
+            "dir": "LONG",
+            "entry_price": 26160.330078125,
+            "sl": 25851.538225446428,
+            "tp": 26623.51785714286,
+            "score": 55.9,
+            "entry_time": "2026-04-18T20:20:35.078167",
+            "size": 1.0
+        },
+        {
+            "symbol": "000001.SS",
+            "name": "SHANGHAI",
+            "dir": "LONG",
+            "entry_price": 4050.908203125,
+            "sl": 4021.034981863839,
+            "tp": 4095.718035016741,
+            "score": 55.3,
+            "entry_time": "2026-04-18T20:20:35.080715",
+            "size": 1.0
+        },
+        {
+            "symbol": "^NSEI",
+            "name": "NIFTY 50",
+            "dir": "LONG",
+            "entry_price": 24366.900390625,
+            "sl": 24110.11495535714,
+            "tp": 24752.078543526786,
+            "score": 56.2,
+            "entry_time": "2026-04-18T20:20:35.081903",
+            "size": 1.0
+        },
+        {
+            "symbol": "^BSESN",
+            "name": "SENSEX",
+            "dir": "LONG",
+            "entry_price": 78493.59375,
+            "sl": 77636.23995535714,
+            "tp": 79779.62444196429,
+            "score": 56.0,
+            "entry_time": "2026-04-18T20:20:35.082975",
+            "size": 1.0
+        }
+    ],
+    "history": [],
+    "stats": {
+        "total_trades": 0,
+        "winning_trades": 0,
+        "losing_trades": 0,
+        "total_pnl": 0,
+        "max_drawdown": 0
+    }
+}
