@@ -1,9 +1,15 @@
+# Stage 1: Build frontend
+FROM node:20-alpine AS frontend-builder
+WORKDIR /app
+COPY frontend/package.json frontend/package-lock.json* ./
+RUN npm install
+COPY frontend/ ./
+RUN npm run build
+
+# Stage 2: Python backend
 FROM python:3.11-slim
 
 WORKDIR /app
-
-# Install Node.js for building frontend
-RUN apt-get update && apt-get install -y nodejs npm && rm -rf /var/lib/apt/lists/*
 
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
@@ -11,13 +17,8 @@ RUN pip install --no-cache-dir yfinance
 
 COPY backend/ .
 
-# Build frontend - copy entire frontend directory and build
-COPY frontend/ ./frontend/
-WORKDIR /app/frontend
-RUN npm install && npm run build
-WORKDIR /app
-
-COPY frontend/dist/ /app/static/
+# Copy frontend build from stage 1
+COPY --from=frontend-builder /app/dist ./static/
 
 RUN mkdir -p outputs/scan_cache outputs/ohlcv outputs/models outputs/data
 
