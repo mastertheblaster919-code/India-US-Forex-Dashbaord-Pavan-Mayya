@@ -21,7 +21,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.concurrency import run_in_threadpool
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from fastapi.responses import JSONResponse
 from typing import List
+from starlette.middleware.base import BaseHTTPMiddleware
 from pydantic import BaseModel
 
 from data_manager import list_cached_dates, load_scan_cache, _load_tickers
@@ -87,6 +89,22 @@ def read_root():
         "docs": "/docs",
         "health": "/api/health"
     }
+
+# Catch-all for SPA routing - serve index.html for non-API routes
+@app.get("/{path:path}")
+async def serve_spa(path: str):
+    """Serve the frontend for any non-API route."""
+    # Skip API routes
+    if path.startswith("api/"):
+        raise HTTPException(status_code=404, detail="API endpoint not found")
+    # Skip static files
+    if path.startswith("static/"):
+        raise HTTPException(status_code=404, detail="File not found")
+    # Serve SPA for all other routes
+    static_path = os.path.join(os.path.dirname(__file__), "static", "index.html")
+    if os.path.exists(static_path):
+        return FileResponse(static_path)
+    raise HTTPException(status_code=404, detail="Not found")
 
 # Mount static frontend files
 static_dir = os.path.join(os.path.dirname(__file__), "static")
