@@ -19,6 +19,8 @@ from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.concurrency import run_in_threadpool
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from typing import List
 from pydantic import BaseModel
 
@@ -76,12 +78,20 @@ app = FastAPI(title="Pavan Mayya VCP API")
 
 @app.get("/")
 def read_root():
-    """Root endpoint - redirects to health check info."""
+    """Serve the frontend SPA."""
+    static_path = os.path.join(os.path.dirname(__file__), "static", "index.html")
+    if os.path.exists(static_path):
+        return FileResponse(static_path)
     return {
         "message": "VCP Dashboard API",
         "docs": "/docs",
         "health": "/api/health"
     }
+
+# Mount static frontend files
+static_dir = os.path.join(os.path.dirname(__file__), "static")
+if os.path.exists(static_dir):
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 app.add_middleware(
     CORSMiddleware,

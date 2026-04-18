@@ -8,6 +8,8 @@ RUN pip install --no-cache-dir yfinance
 
 COPY backend/ .
 
+COPY frontend/dist/ ./static/
+
 RUN mkdir -p outputs/scan_cache outputs/ohlcv outputs/models outputs/data
 
 EXPOSE 8080
