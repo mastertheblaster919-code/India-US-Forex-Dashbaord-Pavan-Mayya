@@ -15,3 +15,4 @@ apscheduler
 pytz
 httpx
 psycopg2-binary
+yfinance
