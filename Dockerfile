@@ -2,11 +2,18 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# Install Node.js for building frontend
+RUN apt-get update && apt-get install -y nodejs npm && rm -rf /var/lib/apt/lists/*
+
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir yfinance
 
 COPY backend/ .
+
+# Build frontend
+COPY frontend/package.json frontend/package-lock.json* frontend/vite.config.ts ./
+RUN npm install && npm run build
 
 COPY frontend/dist/ ./static/
 
