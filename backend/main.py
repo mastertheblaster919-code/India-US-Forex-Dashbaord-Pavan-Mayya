@@ -1748,3 +1748,17 @@ def forex_config():
         }
     except Exception as e:
         return {"success": False, "error": str(e)}
+
+
+# Catch-all for SPA routing - MUST be at the end after all API routes
+@app.get("/{path:path}")
+async def serve_spa(path: str):
+    """Serve the frontend for any non-API route."""
+    if path.startswith("api/"):
+        raise HTTPException(status_code=404, detail="API endpoint not found")
+    if path.startswith("static/"):
+        raise HTTPException(status_code=404, detail="File not found")
+    static_path = os.path.join(os.path.dirname(__file__), "static", "index.html")
+    if os.path.exists(static_path):
+        return FileResponse(static_path)
+    raise HTTPException(status_code=404, detail="Not found")
