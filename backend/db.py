@@ -121,11 +121,14 @@ def execute_insert_returning(query: str, params: tuple = None) -> Dict[str, Any]
 
 
 def bulk_insert(query: str, data: List[tuple]) -> int:
-    """Execute bulk INSERT."""
+    """Execute bulk INSERT with conflict handling for UNIQUE constraints."""
     if not data:
         return 0
     with get_connection() as conn:
         cursor = conn.cursor()
+        if query.strip().upper().startswith("INSERT"):
+            if "OR IGNORE" not in query.upper():
+                query = query.replace("INSERT", "INSERT OR IGNORE", 1)
         cursor.executemany(query, data)
         return len(data)
 

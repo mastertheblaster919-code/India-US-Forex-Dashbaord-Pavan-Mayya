@@ -13855,42 +13855,42 @@
     "cap": "Unknown"
   },
   "EURUSD=X": {
-    "name": "EUR/USD",
+    "name": "EURUSD=X",
     "sector": "Unknown",
     "cap": "Unknown"
   },
   "GBPUSD=X": {
-    "name": "GBP/USD",
+    "name": "GBPUSD=X",
     "sector": "Unknown",
     "cap": "Unknown"
   },
   "USDJPY=X": {
-    "name": "USD/JPY",
+    "name": "USDJPY=X",
     "sector": "Unknown",
     "cap": "Unknown"
   },
   "AUDUSD=X": {
-    "name": "AUD/USD",
+    "name": "AUDUSD=X",
     "sector": "Unknown",
     "cap": "Unknown"
   },
   "NZDUSD=X": {
-    "name": "NZD/USD",
+    "name": "NZDUSD=X",
     "sector": "Unknown",
     "cap": "Unknown"
   },
   "GC=F": {
-    "name": "Gold Jun 26",
+    "name": "GC=F",
     "sector": "Unknown",
     "cap": "Unknown"
   },
   "SI=F": {
-    "name": "Silver May 26",
+    "name": "SI=F",
     "sector": "Unknown",
     "cap": "Unknown"
   },
   "CL=F": {
-    "name": "Crude Oil May 26",
+    "name": "CL=F",
     "sector": "Unknown",
     "cap": "Unknown"
   },
