@@ -99,10 +99,10 @@ def read_root():
         "health": "/api/health"
     }
 
-# Mount static frontend files at root to serve /assets
+# Mount static frontend files at /static to serve assets
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 if os.path.exists(static_dir):
-    app.mount("", StaticFiles(directory=static_dir), name="static")
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 app.add_middleware(
     CORSMiddleware,
