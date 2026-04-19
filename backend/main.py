@@ -99,10 +99,10 @@ def read_root():
         "health": "/api/health"
     }
 
-# Mount static frontend files
+# Mount static frontend files at root to serve /assets
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 if os.path.exists(static_dir):
-    app.mount("/static", StaticFiles(directory=static_dir), name="static")
+    app.mount("", StaticFiles(directory=static_dir), name="static")
 
 app.add_middleware(
     CORSMiddleware,
@@ -1754,10 +1754,16 @@ def forex_config():
 @app.get("/{path:path}")
 async def serve_spa(path: str):
     """Serve the frontend for any non-API route."""
+    # Skip API routes
     if path.startswith("api/"):
         raise HTTPException(status_code=404, detail="API endpoint not found")
+    # Skip static files
     if path.startswith("static/"):
         raise HTTPException(status_code=404, detail="File not found")
+    # Skip assets (frontend JS/CSS)
+    if path.startswith("assets/"):
+        raise HTTPException(status_code=404, detail="File not found")
+    # Serve SPA for all other routes
     static_path = os.path.join(os.path.dirname(__file__), "static", "index.html")
     if os.path.exists(static_path):
         return FileResponse(static_path)
