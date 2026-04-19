@@ -6,7 +6,7 @@ export type SortField =
     | 'TICKER' | 'STAGE' | 'R1%' | 'R5%' | '3M' | '6M' | 'RS' | 'ADX'
     | 'TIGHT' | 'WBASE' | 'TIER';
 export type SortOrder = 'desc' | 'asc';
-export type TabKey = 'scanner' | 'chart' | 'heatmap' | 'simulation' | 'backtest' | 'forward' | 'portfolio' | 'ml' | 'top10' | 'broker' | 'copywinner' | 'alerts' | 'intraday' | 'risk' | 'journal' | 'breadth' | 'forex' | 'watchlist';
+export type TabKey = 'scanner' | 'chart' | 'heatmap' | 'simulation' | 'backtest' | 'forward' | 'portfolio' | 'ml' | 'top10' | 'broker' | 'copywinner' | 'alerts' | 'intraday' | 'risk' | 'journal' | 'breadth' | 'forex' | 'watchlist' | 'ai';
 
 export interface ScanFilters {
     stages: number[];

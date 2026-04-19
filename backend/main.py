@@ -5,6 +5,10 @@ _BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
 if _BACKEND_DIR not in sys.path:
     sys.path.insert(0, _BACKEND_DIR)
 
+# Load .env file
+from dotenv import load_dotenv
+load_dotenv(os.path.join(_BACKEND_DIR, '.env'))
+
 from config_loader import get_backend_port
 
 import math
@@ -77,6 +81,11 @@ def sanitize(obj):
     return obj
 
 app = FastAPI(title="Pavan Mayya VCP API")
+
+@app.get("/api/test")
+def test_endpoint():
+    """Test endpoint to verify API is working"""
+    return {"status": "ok", "message": "API is working", "ai_chat": "/api/ai/chat"}
 
 @app.get("/")
 def read_root():
@@ -1239,6 +1248,40 @@ if __name__ == "__main__":
 # MiniMax API Integration
 MINIMAX_API_KEY = os.environ.get("MINIMAX_API_KEY", "")
 
+# NVIDIA API Integration (supports Llama, Mistral, etc.)
+NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "")
+
+# Google Gemini API
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+
+
+def get_nvidia_client(api_key: str):
+    """Get NVIDIA API client using OpenAI SDK"""
+    try:
+        from openai import OpenAI
+        return OpenAI(
+            base_url="https://integrate.api.nvidia.com/v1",
+            api_key=api_key
+        )
+    except ImportError:
+        return None
+
+
+def chat_with_nvidia(api_key: str, messages: list, model: str = "nvidia/llama-3.1-nemotron-70b-instruct") -> str:
+    """Chat completion via NVIDIA NIM endpoints"""
+    client = get_nvidia_client(api_key)
+    if not client:
+        raise Exception("OpenAI SDK not installed. Run: pip install openai")
+
+    response = client.chat.completions.create(
+        model=model,
+        messages=messages,
+        temperature=0.7,
+        max_tokens=1024
+    )
+    return response.choices[0].message.content
+
+
 class MiniMaxClient:
     def __init__(self, api_key: str):
         self.api_key = api_key
@@ -1267,21 +1310,46 @@ class MiniMaxClient:
             raise Exception(f"MiniMax API error: {response.text}")
 
 
+def chat_with_gemini(api_key: str, messages: list, model: str = "gemini-2.0-flash") -> str:
+    """Chat completion via Google Gemini API"""
+    import requests
+
+    contents = []
+    for msg in messages:
+        if msg.get("role") == "system":
+            continue
+        contents.append({
+            "role": "model" if msg.get("role") == "assistant" else "user",
+            "parts": [{"text": msg.get("content", "")}]
+        })
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+    payload = {"contents": contents, "generationConfig": {"temperature": 0.7, "maxOutputTokens": 1024}}
+    params = {"key": api_key}
+
+    response = requests.post(url, json=payload, params=params, timeout=30)
+    if response.status_code == 200:
+        result = response.json()
+        return result["candidates"][0]["content"]["parts"][0]["text"]
+    else:
+        raise Exception(f"Gemini API error: {response.text}")
+
+
 @app.post("/api/ai/analyze-position")
 async def analyze_position_with_ai(request: dict):
-    """Analyze a position using MiniMax AI"""
-    api_key = request.get("api_key") or MINIMAX_API_KEY
+    """Analyze a position using NVIDIA (default) or MiniMax AI"""
+    provider = request.get("provider", "nvidia")
+    api_key = request.get("api_key") or NVIDIA_API_KEY or MINIMAX_API_KEY
     if not api_key:
-        raise HTTPException(status_code=400, detail="MiniMax API key required")
-    
+        raise HTTPException(status_code=400, detail="API key required. Set NVIDIA_API_KEY or MINIMAX_API_KEY in .env")
+
     ticker = request.get("ticker", "")
     entry = request.get("entry_price", 0)
     sl = request.get("stop_loss", 0)
     target = request.get("target", 0)
     quantity = request.get("quantity", 0)
     chart_data = request.get("chart_data", [])
-    
-    # Build analysis prompt
+
     prompt = f"""Analyze this trading position for NSE stock:
 
 Ticker: {ticker}
@@ -1307,27 +1375,33 @@ Please provide:
 
 Keep response concise and actionable. Use INR for currency."""
 
-    client = MiniMaxClient(api_key)
+    messages = [
+        {"role": "system", "content": "You are an expert stock market analyst with deep knowledge of technical analysis, fundamental analysis, and risk management. Provide clear, actionable insights."},
+        {"role": "user", "content": prompt}
+    ]
+
     try:
-        result = client.chat_completion([
-            {"role": "system", "content": "You are an expert stock market analyst with deep knowledge of technical analysis, fundamental analysis, and risk management. Provide clear, actionable insights."},
-            {"role": "user", "content": prompt}
-        ])
-        return {"analysis": result, "ticker": ticker}
+        if provider == "nvidia":
+            result = chat_with_nvidia(api_key, messages)
+        else:
+            client = MiniMaxClient(api_key)
+            result = client.chat_completion(messages)
+        return {"analysis": result, "ticker": ticker, "provider": provider}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/api/ai/analyze-stock")
 async def analyze_stock_with_ai(request: dict):
-    """Analyze a stock using MiniMax AI"""
-    api_key = request.get("api_key") or MINIMAX_API_KEY
+    """Analyze a stock using NVIDIA (default) or MiniMax AI"""
+    provider = request.get("provider", "nvidia")
+    api_key = request.get("api_key") or NVIDIA_API_KEY or MINIMAX_API_KEY
     if not api_key:
-        raise HTTPException(status_code=400, detail="MiniMax API key required")
-    
+        raise HTTPException(status_code=400, detail="API key required. Set NVIDIA_API_KEY or MINIMAX_API_KEY in .env")
+
     ticker = request.get("ticker", "")
     chart_data = request.get("chart_data", [])
-    
+
     prompt = f"""Perform technical analysis on this NSE stock:
 
 Ticker: {ticker}
@@ -1344,6 +1418,66 @@ Provide:
 6. Risk assessment
 
 Be concise and practical. Use INR."""
+
+    messages = [
+        {"role": "system", "content": "You are an expert stock market analyst with deep knowledge of technical analysis."},
+        {"role": "user", "content": prompt}
+    ]
+
+    try:
+        if provider == "nvidia":
+            result = chat_with_nvidia(api_key, messages)
+        else:
+            client = MiniMaxClient(api_key)
+            result = client.chat_completion(messages)
+        return {"analysis": result, "ticker": ticker, "provider": provider}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/ai/chat")
+async def ai_chat(request: dict):
+    """General AI chat endpoint for asking market questions"""
+    print(f"AI chat endpoint called with request: {request}")
+    provider = request.get("provider", "gemini")
+    api_key = request.get("api_key") or GEMINI_API_KEY or NVIDIA_API_KEY or MINIMAX_API_KEY
+    if not api_key:
+        raise HTTPException(status_code=400, detail="API key required. Set GEMINI_API_KEY, NVIDIA_API_KEY, or MINIMAX_API_KEY in .env")
+
+    question = request.get("question", "")
+    context = request.get("context", "")
+
+    system_prompt = """You are an expert stock market analyst and trading assistant specializing in:
+- VCP (Volatility Contraction Pattern) trading
+- Indian NSE market
+- Technical analysis (RSI, ADX, MACD, Bollinger Bands)
+- Risk management and position sizing
+- FOREX trading
+- US S&P 500 stocks
+
+Provide clear, actionable insights. Keep responses concise. Use INR for Indian stocks, USD for US stocks."""
+
+    prompt = question
+    if context:
+        prompt = f"Context: {context}\n\nQuestion: {question}"
+
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": prompt}
+    ]
+
+    try:
+        if provider == "nvidia":
+            result = chat_with_nvidia(api_key, messages)
+        elif provider == "gemini":
+            result = chat_with_gemini(api_key, messages)
+        else:
+            client = MiniMaxClient(api_key)
+            result = client.chat_completion(messages)
+        return {"response": result, "provider": provider}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # Cache for breadth data
 _BREADTH_CACHE = None

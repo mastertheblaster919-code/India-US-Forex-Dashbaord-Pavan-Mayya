@@ -170,3 +170,25 @@ export const fetchPresetScan = async (presetId: string, market: string = 'IN', n
     });
     return data;
 };
+
+export const aiChat = async (question: string, context?: string, provider: string = 'nvidia') => {
+    const { data } = await api.post('/ai/chat', { question, context, provider });
+    return data as { response: string; provider: string };
+};
+
+export const analyzeStockWithAI = async (ticker: string, chartData: any[] = [], provider: string = 'nvidia') => {
+    const { data } = await api.post('/ai/analyze-stock', { ticker, chart_data: chartData, provider });
+    return data as { analysis: string; ticker: string; provider: string };
+};
+
+export const analyzePositionWithAI = async (position: {
+    ticker: string;
+    entry_price: number;
+    stop_loss: number;
+    target: number;
+    quantity: number;
+    chart_data?: any[];
+}, provider: string = 'nvidia') => {
+    const { data } = await api.post('/ai/analyze-position', { ...position, provider });
+    return data as { analysis: string; ticker: string; provider: string };
+};

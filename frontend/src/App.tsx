@@ -22,10 +22,11 @@ import AlertsTab from './components/AlertsTab';
 import IntradayTab from './components/IntradayTab';
 import ForexBotTab from './components/ForexBotTab';
 import MarketBotTab from './components/MarketBotTab';
+import AIChatTab from './components/AIChatTab';
 import ErrorBoundary from './components/ErrorBoundary';
 
 import {
-  Search, BarChart3, Flame, Zap, BookOpen, TrendingUp, Briefcase, Brain, Crown, Shield, Copy, Send, Eye, Activity
+  Search, BarChart3, Flame, Zap, BookOpen, TrendingUp, Briefcase, Brain, Crown, Shield, Copy, Send, Eye, Activity, MessageSquare
 } from 'lucide-react';
 
 // ─── Tab definitions ─────────────────────────────────────────────────────────
@@ -45,6 +46,7 @@ const TABS: { key: TabKey; label: string; icon: React.ElementType; color: string
   { key: 'copywinner', label: 'Copy Winner', icon: Copy, color: '#f59e0b' },
   { key: 'alerts', label: 'Alerts', icon: Send, color: '#3b82f6' },
   { key: 'forex', label: 'FOREX Bot', icon: Activity, color: '#f59e0b' },
+  { key: 'ai', label: 'AI Chat', icon: MessageSquare, color: '#a855f7' },
 ];
 
 const today = new Date().toISOString().slice(0, 10);
@@ -588,6 +590,10 @@ function App() {
                 {sidebar.market === 'US' && <MarketBotTab market="US" />}
                 {sidebar.market === 'IN' && <MarketBotTab market="IN" />}
               </>
+            )}
+
+            {activeTab === 'ai' && (
+              <AIChatTab />
             )}
 
           </div>
